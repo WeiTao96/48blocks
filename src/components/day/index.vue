@@ -2,6 +2,9 @@
 import Blocks from '../blocks/index.vue'
 import { IBlock, IDate } from '../../types/index.interface';
 import { toRefs, ref, reactive } from '@vue/reactivity';
+import path from 'path'
+import fs from 'fs'
+import { dirExists } from '../../utils/file'
 
 const props = defineProps<{ day: IDate }>()
 
@@ -72,15 +75,26 @@ const handleSave = () => {
 }
 
 const downloadJson = (content: IDate) => {
-  let eleLink = document.createElement('a')
+  // let eleLink = document.createElement('a')
+  // let data = JSON.stringify(content)
+  // eleLink.download = `${content.name}.json`
+  // eleLink.style.display = 'none'
+  // let blob = new Blob([data], { type: "text/plain;charset=utf-8" })
+  // eleLink.href = URL.createObjectURL(blob);
+  // document.body.appendChild(eleLink);
+  // eleLink.click();
+  // document.body.removeChild(eleLink);
+  const saveFolder = path.join(process.env.DIST as string,'/days')
+  dirExists(saveFolder)
   let data = JSON.stringify(content)
-  eleLink.download = `${content.name}.json`
-  eleLink.style.display = 'none'
-  let blob = new Blob([data], { type: "text/plain;charset=utf-8" })
-  eleLink.href = URL.createObjectURL(blob);
-  document.body.appendChild(eleLink);
-  eleLink.click();
-  document.body.removeChild(eleLink);
+  fs.writeFile(path.join(saveFolder,`${content.name}.json`),data,(err)=>{
+    if(err){
+      alert(err)
+    }else{
+      alert('保存成功')
+    }
+  })
+
 }
 
 const handleOver = (e: MouseEvent, info: string) => {
