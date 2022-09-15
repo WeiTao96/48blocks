@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import Day from '../day/index.vue'
-import { ref, reactive } from 'vue'
+import MiniBlocks from '../blocks/mini.vue'
+import { ref, reactive, onMounted } from 'vue'
 import { generateADay } from "../../utils/generateADay"
 import { IDate } from '../../types/index.interface'
+import path from 'path'
+import fs from 'fs'
+import { dirExists } from '../../utils/file'
+
+const saveFolder = path.join(process.env.DIST as string, '/days')
 
 const mydays: Array<IDate> = []
 
 let days = ref(mydays)
-
-let reader = new FileReader();
 
 const total = reactive({
   waste: 0,
@@ -19,21 +23,22 @@ const total = reactive({
   efficient: 0,
 })
 
-const handleChange = async () => {
-  let file = document.getElementById("files") as HTMLInputElement
-  if (file.files && file.files?.length > 0) {
+const selectDay = ref()
 
-    reader.readAsText(file.files[0])
+const getAllDays = async () => {
+  try {
+    const fileNames = fs.readdirSync(saveFolder)
+    fileNames.forEach(fileName => {
+      const file = fs.readFileSync(`${saveFolder}\\${fileName}`)
+      let day = JSON.parse(file.toString())
+      days.value.push(day)
+      countAll()
+    })
+  } catch (error) {
+    dirExists(saveFolder)
   }
 }
 
-reader.onload = (result) => {
-  if (result.target) {
-    let day = JSON.parse(result.target.result as string)
-    days.value.push(day)
-  }
-  countAll()
-}
 
 const countAll = () => {
   total.waste = 0
@@ -70,20 +75,31 @@ const countAll = () => {
   }
 }
 
+const handleSelectDay = (day: IDate) => {
+  selectDay.value = day
+}
+
 const handleANewDay = () => {
   let day = generateADay()
   days.value.push(day)
 }
+
+onMounted(() => {
+  getAllDays()
+})
 
 </script>
 
 <template>
   <div class="content">
     <div>
-      <input type="file" id="files" @change="handleChange" />
       <button @click="handleANewDay">生成一天</button>
     </div>
-    <Day v-for="day in days" :day="day" :key="day.name"></Day>
+    <Day v-if="selectDay" :day="selectDay"></Day>
+    <div v-for="day in days" :key="day.name" class="mini-block" @click="handleSelectDay(day)">
+      <p>{{day.name}}</p>
+      <MiniBlocks :list="day.blocks"></MiniBlocks>
+    </div>
     <div>
       <p>{{ days.length }}天</p>
       <span>浪费{{ total.waste / 2 }}小时</span>&nbsp
@@ -99,5 +115,10 @@ const handleANewDay = () => {
 <style scoped>
 .content {
   text-align: center;
+}
+
+.mini-block {
+  height: 100px;
+  width: 150px;
 }
 </style>
