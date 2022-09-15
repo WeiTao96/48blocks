@@ -8,7 +8,7 @@ import path from 'path'
 import fs from 'fs'
 import { dirExists } from '../../utils/file'
 
-const saveFolder = path.join(process.env.DIST as string, '/days')
+const saveFolder = path.join(process.cwd(), '/days')
 
 const mydays: Array<IDate> = []
 
@@ -81,7 +81,10 @@ const handleSelectDay = (day: IDate) => {
 
 const handleANewDay = () => {
   let day = generateADay()
-  days.value.push(day)
+  const index = days.value.findIndex(item=>item.name===day.name)
+  if(index === -1){
+    days.value.push(day)
+  }
 }
 
 onMounted(() => {
@@ -120,5 +123,7 @@ onMounted(() => {
 .mini-block {
   height: 100px;
   width: 150px;
+  display: inline-block;
+  margin: 10px;
 }
 </style>

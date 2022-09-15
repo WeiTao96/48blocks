@@ -75,7 +75,7 @@ const handleSave = () => {
 }
 
 const downloadJson = (content: IDate) => {
-  const saveFolder = path.join(process.env.DIST as string,'/days')
+  const saveFolder = path.join(process.cwd(),'/days')
   dirExists(saveFolder)
   let data = JSON.stringify(content)
   fs.writeFile(path.join(saveFolder,`${content.name}.json`),data,(err)=>{
