@@ -75,15 +75,6 @@ const handleSave = () => {
 }
 
 const downloadJson = (content: IDate) => {
-  // let eleLink = document.createElement('a')
-  // let data = JSON.stringify(content)
-  // eleLink.download = `${content.name}.json`
-  // eleLink.style.display = 'none'
-  // let blob = new Blob([data], { type: "text/plain;charset=utf-8" })
-  // eleLink.href = URL.createObjectURL(blob);
-  // document.body.appendChild(eleLink);
-  // eleLink.click();
-  // document.body.removeChild(eleLink);
   const saveFolder = path.join(process.env.DIST as string,'/days')
   dirExists(saveFolder)
   let data = JSON.stringify(content)
